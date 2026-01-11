@@ -1,0 +1,42 @@
+services:
+  api-fornecedor:
+    build: .
+    image: minha-api-fornecedor:v1
+    container_name: api-fornecedor
+    ports:
+      - "3333:3333"
+    env_file:
+      - .env
+    environment:
+      - TZ=America/Sao_Paulo
+      # Variáveis para conexão com MySQL (simulando o RDS)
+      - DB_HOST=mysqldb
+      - DB_PORT=3306
+      - DB_USER=${USER_DB}
+      - DB_PASS=${PWD_DB}
+      - DB_NAME=fornecedor_db
+    depends_on:
+      mysqldb:
+        condition: service_healthy
+
+  mysqldb:
+    image: mysql:8.0
+    container_name: mysqldb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${PWD_DB}
+      MYSQL_DATABASE: fornecedor_db
+      MYSQL_USER: ${USER_DB}
+      MYSQL_PASSWORD: ${PWD_DB}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s    # Tenta a cada 10 segundos
+      timeout: 5s      # Se demorar mais de 5s, considera falha
+      retries: 5
+
+volumes:
+  mysql-data:
