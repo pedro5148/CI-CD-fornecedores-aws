@@ -18,7 +18,7 @@ export const getAllFornec = catchAsync(async (req, res) => {
     })
 });
 
-export const getFornecbyId => {
+export const getFornecbyId = catchAsync(async (req, res, next) => {
     
     const fornecedor = await fornecedorService.findById(req.params.id);
     

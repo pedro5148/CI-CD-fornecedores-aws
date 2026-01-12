@@ -12,6 +12,12 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
+      - name: Gerar arquivo .env
+        run: |
+          touch .env
+          echo "USER_DB=${{ secrets.USER_DB }}" >> .env
+          echo "PWD_DB=${{ secrets.PWD_DB }}" >> .env
+
       - name: Build dos Containers
         run: docker compose build --no-cache
 
@@ -24,9 +30,15 @@ jobs:
       - name: Verificar Status
         run: docker compose ps
 
-      # O comando exato que você usa para testar/mockar
       - name: Rodar Importação de Mock
+        # Agora o container já tem as variáveis de ambiente carregadas
         run: docker compose exec -T api-fornecedor node /app/data/import-fornecedores.js --import
+
+      # Passo importante para debugar o erro do MySQL ou da API
+      - name: Ver Logs em caso de falha
+        if: failure() 
+        # Pega logs de AMBOS os serviços para entender quem caiu primeiro
+        run: docker compose logs
 
       - name: Derrubar Containers
         if: always()
