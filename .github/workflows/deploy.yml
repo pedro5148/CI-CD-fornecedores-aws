@@ -29,7 +29,7 @@ jobs:
         # Entra na pasta src para instalar (conforme sua estrutura)
         run: |
           cd src
-          npm ci
+          npm install
 
       # Descomente abaixo se você tiver scripts de teste configurados no package.json
       # - name: Executar Testes Unitários
